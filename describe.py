@@ -1,52 +1,28 @@
-import numpy as np # type: ignore
-import csv
 import sys
 import os
 
-
-def load_csv(filename):
-    dataset = list()
-    with open(filename) as csvfile:
-        reader = csv.reader(csvfile)
-        for _ in reader:
-            row = list()
-            for value in _:
-                try:
-                    value = float(value)
-                except:
-                    if not value:
-                        value = np.nan
-                row.append(value)
-            dataset.append(row)
-    return np.array(dataset)
-
-
-def count(data):
-    return len(data)
-
-
-def mean(data):
-    total = 0
-    for x in data:
-        print(x)
-        total += x
-    if len(data) == 0:
-        return 0
-    return total / len(data)
+from utils import load_csv
+from maths import *
 
 
 def main():
     try:
         if len(sys.argv) != 2 or sys.argv[1][-4:] != ".csv" or not os.path.exists(sys.argv[1]):
             raise ValueError("\'describe.py\' needs a csv file as argument.")
-        data = load_csv(sys.argv[1])
-        header = data[0]
-        body = data[1:]
+        header, body = load_csv(sys.argv[1])
+        max_len = max(len(string) for string in header)
+        print(f'| {"":{max_len}} | {"Count":^12} | {"Mean":^12} | {"Std":^12} | {"Min":^12} | {"25%":^12} | {"50%":^12} | {"75%":^12} | {"Max":^12} |')
         for i in range(len(header)):
-            column = body[:, i]
-            print(header[i], end=" ")
-            print(count(column), end=" ")
-            print(mean(column))
+            column = [row[i] for row in body]
+            count = count_(column)
+            mean = mean_(column)
+            std = std_(column)
+            minn = min_(column)
+            q1 = q1_(column)
+            median = median_(column)
+            q3 = q3_(column)
+            maxx = max_(column)
+            print(f'| {header[i]:<{max_len}} | {count:12.4f} | {mean:12.4f} | {std:12.4f} | {minn:12.4f} | {q1:12.4f} | {median:12.4f} | {q3:12.4f} | {maxx:12.4f} |')
         
 
     except (ValueError, Exception) as err:
