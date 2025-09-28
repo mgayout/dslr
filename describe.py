@@ -15,14 +15,18 @@ def main():
         for i in range(len(header)):
             column = [row[i] for row in body]
             count = count_(column)
-            mean = mean_(column)
-            std = std_(column)
-            minn = min_(column)
-            q1 = q1_(column)
-            median = median_(column)
-            q3 = q3_(column)
-            maxx = max_(column)
-            print(f'| {header[i]:<{max_len}} | {count:12.4f} | {mean:12.4f} | {std:12.4f} | {minn:12.4f} | {q1:12.4f} | {median:12.4f} | {q3:12.4f} | {maxx:12.4f} |')
+            if not all(isinstance(d, (int, float)) for d in column):
+                print(f'| {header[i]:<{max_len}} | {count:12.4f} | {0:12.4f} | {0:12.4f} | {0:12.4f} | {0:12.4f} | {0:12.4f} | {0:12.4f} | {0:12.4f} |')
+            else:
+                column.sort()
+                mean = mean_(column)
+                std = std_(column, mean)
+                minn = min(column)
+                q1 = percentile_(column, 25)
+                median = percentile_(column, 50)
+                q3 = percentile_(column, 75)
+                maxx = max(column)
+                print(f'| {header[i]:<{max_len}} | {count:12.4f} | {mean:12.4f} | {std:12.4f} | {minn:12.4f} | {q1:12.4f} | {median:12.4f} | {q3:12.4f} | {maxx:12.4f} |')
         
 
     except (ValueError, Exception) as err:
