@@ -2,31 +2,27 @@ import numpy as np # type: ignore
 
 
 def count_(data):
-    return len(data)
+    count = 0
+    for d in data:
+        if isinstance(d, (int, float, np.floating)) and not np.isnan(d):
+            count += 1
+        elif isinstance(d, (str)):
+            count += 1
+    return count
 
 
 def mean_(data):
-    total = 0
-    for d in data:
-        if np.isnan(d):
-            continue
-        total += d
-    return total / len(data)
+    return sum(data) / len(data)
 
 
 def std_(data, mean):
-    total = 0
-    for d in data:
-        if np.isnan(d):
-            continue
-        total += pow(d - mean, 2)
-    return pow(total / (len(data)), 0.5)
+    return (sum((d - mean) ** 2 for d in data) / len(data)) ** 0.5
 
 
 def percentile_(data, p):
+    data.sort()
     idx = (len(data) - 1) * (p / 100)
-    if isinstance(idx, int):
-        return data[idx]
-    idx_min = int(idx)
-    idx_max = idx_min + 1
-    return (data[idx_min] * (idx_max - idx) + data[idx_max] * (idx - idx_min))
+    if idx.is_integer():
+        return data[int(idx)]
+    i = int(idx)
+    return data[i] * (i + 1 - idx) + data[i + 1] * (idx - i)
